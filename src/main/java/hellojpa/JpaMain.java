@@ -17,22 +17,21 @@ public class JpaMain {
 
         long id = 1L;
 
-        long startTime = System.currentTimeMillis();
         transaction.begin();
-        System.out.println("=== INSERT START ===");
-        for(int i=0; i<100000; i++) {
-            Member member = new Member();
-            member.setId(id++);
-            member.setName("hello");
+        Member member = new Member();
+        member.setId(1L);
+        member.setName("hello");
+        entityManager.persist(member);
 
-            entityManager.persist(member);
-        }
-        System.out.println("=== INSERT END ===");
+        System.out.println("=== UPDATE START ===");
+
+        Member findMember = entityManager.find(Member.class, 1L);
+        findMember.setName("Yunbok");
+
+        System.out.println("=== UPDATE END ===");
 
         System.out.println("=== COMMIT ===");
         transaction.commit();
-
-        System.out.println("소요 시간 : " + (System.currentTimeMillis() - startTime)/1000.0 + " milli seconds");
 
         entityManager.close();
         entityManagerFactory.close();
