@@ -15,20 +15,55 @@ public class JpaMain {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         EntityTransaction transaction = entityManager.getTransaction();
 
+        long id = 1L;
+
+        long startTime = System.currentTimeMillis();
         transaction.begin();
+        System.out.println("=== INSERT START ===");
+        for(int i=0; i<100000; i++) {
+            Member member = new Member();
+            member.setId(id++);
+            member.setName("hello");
 
-        Member member = new Member();
-        member.setId(1L);
-        member.setName("hello");
-
-        entityManager.persist(member);
-
-        for(int i=0; i<10; i++) {
-            Member findMember = entityManager.find(Member.class, 1L);
-            System.out.println(findMember);
+            entityManager.persist(member);
         }
+        System.out.println("=== INSERT END ===");
 
+        System.out.println("=== COMMIT ===");
         transaction.commit();
+
+        System.out.println("소요 시간 : " + (System.currentTimeMillis() - startTime)/1000.0 + " milli seconds");
+
+        entityManager.close();
+        entityManagerFactory.close();
+    }
+
+    /**
+     * INSERT 쿼리는 모아서 commit 시점에 한번에 보냄.
+     * 배치 설정을 활용하면 버퍼링 기능 사용 가능(데이터를 모아서 한번의 쿼리로 쫙!)
+     */
+    void batch() {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+
+        long id = 1L;
+
+        long startTime = System.currentTimeMillis();
+        transaction.begin();
+        System.out.println("=== INSERT START ===");
+        for(int i=0; i<100000; i++) {
+            Member member = new Member();
+            member.setId(id++);
+            member.setName("hello");
+
+            entityManager.persist(member);
+        }
+        System.out.println("=== INSERT END ===");
+
+        System.out.println("=== COMMIT ===");
+        transaction.commit();
+
+        System.out.println("소요 시간 : " + (System.currentTimeMillis() - startTime)/1000.0 + " milli seconds");
 
         entityManager.close();
         entityManagerFactory.close();
