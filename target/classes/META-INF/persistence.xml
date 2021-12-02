@@ -17,10 +17,7 @@
             <property name="hibernate.use_sql_comments" value="true"/>
             <property name="hibernate.hbm2ddl.auto" value="create-drop" />
 
-
-            <property name="hibernate.jdbc.batch_size" value="30"/>
-
-
+            <property name="hibernate.jdbc.batch_size" value="15"/>
         </properties>
     </persistence-unit>
 </persistence>
