@@ -1,10 +1,9 @@
-package hellojpa;
+package hibernate_basic;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import javax.transaction.Transaction;
 
 public class JpaMain {
 
@@ -12,62 +11,46 @@ public class JpaMain {
 
 
     public static void main(String[] args) {
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-        EntityTransaction transaction = entityManager.getTransaction();
-
-        long id = 1L;
-
-        transaction.begin();
-        Member member = new Member();
-        member.setId(1L);
-        member.setName("hello");
-        entityManager.persist(member);
-
-        System.out.println("=== UPDATE START ===");
-
-        Member findMember = entityManager.find(Member.class, 1L);
-        findMember.setName("Yunbok");
-
-        System.out.println("=== UPDATE END ===");
-
-        System.out.println("=== COMMIT ===");
-        transaction.commit();
-
-        entityManager.close();
-        entityManagerFactory.close();
+        JpaMain jpaMain = new JpaMain();
+        jpaMain.batch();
     }
 
     /**
      * INSERT 쿼리는 모아서 commit 시점에 한번에 보냄.
      * 배치 설정을 활용하면 버퍼링 기능 사용 가능(데이터를 모아서 한번의 쿼리로 쫙!)
+     *
      */
     void batch() {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         EntityTransaction transaction = entityManager.getTransaction();
 
-        long id = 1L;
-
+        //== 측정 시작 ==//
         long startTime = System.currentTimeMillis();
-        transaction.begin();
-        System.out.println("=== INSERT START ===");
-        for(int i=0; i<100000; i++) {
-            Member member = new Member();
-            member.setId(id++);
-            member.setName("hello");
 
+        //== 트랜잭션 시작 ==//
+        transaction.begin();
+
+        //== 데이터 100,000회 삽입
+        // 소요 시간 : 842.685 milli seconds
+
+        System.out.println("=== INSERT START ===");
+        for(int i=0; i<1000000; i++) {
+            Member member = new Member();
+            member.setName("yunbok");
             entityManager.persist(member);
         }
         System.out.println("=== INSERT END ===");
 
+        //== 트랜잭션 종료 ==//
         System.out.println("=== COMMIT ===");
         transaction.commit();
 
+        //== 측정 종료 ==//
         System.out.println("소요 시간 : " + (System.currentTimeMillis() - startTime)/1000.0 + " milli seconds");
 
         entityManager.close();
         entityManagerFactory.close();
     }
-
     /**
      * 동일성 보장
      * 1차 캐시에 존재하는 엔티티는 몇십, 몇백번을 읽어도 동일한 엔티티
@@ -76,19 +59,21 @@ public class JpaMain {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         EntityTransaction transaction = entityManager.getTransaction();
 
+        //== 트랜잭션 시작 ==//
         transaction.begin();
 
+        //== Member 저장 ==//
         Member member = new Member();
-        member.setId(1L);
-        member.setName("hello");
-
+        member.setName("yunbok");
         entityManager.persist(member);
 
+        //== Member 10회 조회 ==//
         for(int i=0; i<10; i++) {
             Member findMember = entityManager.find(Member.class, 1L);
             System.out.println(findMember);
         }
 
+        //== 트랜잭션 종료 ==//
         transaction.commit();
 
         entityManager.close();
@@ -103,20 +88,22 @@ public class JpaMain {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         EntityTransaction transaction = entityManager.getTransaction();
 
+        //== 트랜잭션 시작 ==//
         transaction.begin();
 
+        //== Member 저장 ==//
         Member member = new Member();
         member.setId(1L);
         member.setName("hello");
-
         entityManager.persist(member);
-        Member findMember = entityManager.find(Member.class, 1L);
 
+        //== 조회후 출력 ==//
+        Member findMember = entityManager.find(Member.class, 1L);
         System.out.println("id : " + findMember.getId());
         System.out.println("name : " + findMember.getName());
 
+        //== 트랜잭션 종료 ==//
         transaction.commit();
-
         entityManager.close();
         entityManagerFactory.close();
     }
@@ -190,6 +177,36 @@ public class JpaMain {
         } finally {
             entityManager.close();
         }
+    }
 
+    void dirtyCheck() {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+
+        long id = 1L;
+
+        //== 트랜잭션 시작 ==//
+        transaction.begin();
+
+        //== Member 저장 ==//
+        Member member = new Member();
+        member.setId(1L);
+        member.setName("yunbok");
+        entityManager.persist(member);
+
+        //== Member 수정 ==//
+        System.out.println("=== UPDATE START ===");
+        Member findMember = entityManager.find(Member.class, 1L);
+        findMember.setName("yunbok2");
+        findMember.setName("yunbok3");
+        findMember.setName("yunbok4");
+        System.out.println("=== UPDATE END ===");
+
+        //== 트랜잭션 종료 ==//
+        System.out.println("=== COMMIT ===");
+        transaction.commit();
+
+        entityManager.close();
+        entityManagerFactory.close();
     }
 }
