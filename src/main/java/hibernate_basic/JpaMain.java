@@ -6,8 +6,10 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
 public class JpaMain {
+    // 5 : 22.389
+    // 10 : 22.232
 
-    private static  EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("jpa_basic_db");
+    private static final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("jpa_basic_db");
 
 
     public static void main(String[] args) {
@@ -40,6 +42,7 @@ public class JpaMain {
         entityManagerFactory.close();
     }
 
+
     /**
      * INSERT 쿼리는 모아서 commit 시점에 한번에 보냄.
      * 배치 설정을 활용하면 버퍼링 기능 사용 가능(데이터를 모아서 한번의 쿼리로 쫙!)
@@ -55,15 +58,13 @@ public class JpaMain {
         //== 트랜잭션 시작 ==//
         transaction.begin();
 
-        //== 데이터 100,000회 삽입
-        // 소요 시간 : 842.685 milli seconds - batch Size : 없음
-        // 소요 시간 : 800.646 milli seconds - batch Size : 30
-        // 쇼이 시간 :
-
+        //== 데이터 10만회 삽입 ==//
+        Long id = 1L;
         System.out.println("=== INSERT START ===");
         for(int i=0; i<100000; i++) {
             Member member = new Member();
             member.setName("yunbok");
+            member.setId(id++);
             entityManager.persist(member);
         }
         System.out.println("=== INSERT END ===");

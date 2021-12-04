@@ -8,15 +8,19 @@
             <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
             <property name="javax.persistence.jdbc.user" value="root"/>
             <property name="javax.persistence.jdbc.password" value="1234"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/jpa_basic_db"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/jpa_basic_db?autoReconnect=true&amp;rewriteBatchedStatements=true&amp;profileSQL=true"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect"/> <!-- 방언 설정, 각 데이터베이스 쿼리마다 다른 기능을 방언이라고 한다. -->
 
             <!-- 옵션 -->
-            <property name="hibernate.show_sql" value="true"/>
-            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.format_sql" value="false"/>
             <property name="hibernate.use_sql_comments" value="true"/>
             <property name="hibernate.hbm2ddl.auto" value="create-drop" />
-            <property name="hibernate.jdbc.batch_size" value="1000"/>
+            <property name="hibernate.jdbc.batch_size" value="200"/>
+
+            <property name="hibernate.cache.use_second_level_cache" value="true"/>
+            <property name="hibernate.cache.use_query_cache" value="true"/>
+
         </properties>
     </persistence-unit>
 </persistence>
