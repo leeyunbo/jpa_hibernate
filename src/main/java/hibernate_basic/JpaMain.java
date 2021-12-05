@@ -1,6 +1,8 @@
 package hibernate_basic;
 
 import javax.persistence.*;
+import java.sql.BatchUpdateException;
+import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 
 public class JpaMain {
@@ -13,7 +15,7 @@ public class JpaMain {
     public static void main(String[] args) {
         JpaMain jpaMain = new JpaMain();
         jpaMain.saveMember();
-        jpaMain.batch();
+        jpaMain.batch(1L);
     }
 
     void jpql() {
@@ -83,20 +85,19 @@ public class JpaMain {
      * 배치 설정을 활용하면 버퍼링 기능 사용 가능(데이터를 모아서 한번의 쿼리로 쫙!)
      *
      */
-    void batch() {
+    void batch(long id) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         EntityTransaction transaction = entityManager.getTransaction();
 
         //== 측정 시작 ==//
         long startTime = System.currentTimeMillis();
-        long id = 1L;
         try {
             //== 트랜잭션 시작 ==//
             transaction.begin();
 
             //== 데이터 10만회 삽입 ==//
             System.out.println("=== INSERT START ===");
-            for (int i = 0; i < 5000; i++) {
+            for (int i = 0; i < 100; i++) {
                 Member member = new Member();
                 member.setName("yunbok");
                 member.setId(id++);
@@ -234,7 +235,7 @@ public class JpaMain {
 
         try {
             Member member = new Member();
-            member.setId(192L);
+            member.setId(1L);
             member.setName("hello");
             entityManager.persist(member);
 
