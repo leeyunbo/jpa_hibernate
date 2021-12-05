@@ -12,14 +12,12 @@
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect"/> <!-- 방언 설정, 각 데이터베이스 쿼리마다 다른 기능을 방언이라고 한다. -->
 
             <!-- 옵션 -->
-            <property name="hibernate.show_sql" value="false"/>
-            <property name="hibernate.format_sql" value="false"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
             <property name="hibernate.use_sql_comments" value="true"/>
-            <property name="hibernate.hbm2ddl.auto" value="create-drop" />
-            <property name="hibernate.jdbc.batch_size" value="200"/>
+            <property name="hibernate.hbm2ddl.auto" value="update" />
+            <property name="hibernate.jdbc.batch_size" value="10"/>
 
-            <property name="hibernate.cache.use_second_level_cache" value="true"/>
-            <property name="hibernate.cache.use_query_cache" value="true"/>
 
         </properties>
     </persistence-unit>

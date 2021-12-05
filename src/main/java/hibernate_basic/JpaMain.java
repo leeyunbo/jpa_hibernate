@@ -1,9 +1,7 @@
 package hibernate_basic;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import javax.persistence.*;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 public class JpaMain {
     // 5 : 22.389
@@ -14,6 +12,7 @@ public class JpaMain {
 
     public static void main(String[] args) {
         JpaMain jpaMain = new JpaMain();
+        jpaMain.saveMember();
         jpaMain.batch();
     }
 
@@ -42,6 +41,42 @@ public class JpaMain {
         entityManagerFactory.close();
     }
 
+    void selectUpdateDataInTransaction() {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+
+        //== 측정 시작 ==//
+        try {
+            //== 트랜잭션 시작 ==//
+            transaction.begin();
+
+            Member member = new Member();
+            member.setName("yunbok");
+            member.setId(1L);
+            entityManager.persist(member);
+
+            member.setName("yunbok2");
+
+            Member findMember = (Member) entityManager.createQuery(
+                    "select m From Member m where m.name = 'yunbok'"
+            ).getSingleResult();
+            System.out.println("findMember : {findMember.getId() : " + findMember.getId() + "findMember.getName() : " + findMember.getName() + "}");
+
+            System.out.println("=== INSERT END ===");
+
+            //== 트랜잭션 종료 ==//
+            System.out.println("=== COMMIT ===");
+            transaction.commit();
+
+            //== 측정 종료 ==//
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        } finally {
+            entityManager.close();
+            entityManagerFactory.close();
+        }
+    }
+
 
     /**
      * INSERT 쿼리는 모아서 commit 시점에 한번에 보냄.
@@ -54,30 +89,34 @@ public class JpaMain {
 
         //== 측정 시작 ==//
         long startTime = System.currentTimeMillis();
+        long id = 1L;
+        try {
+            //== 트랜잭션 시작 ==//
+            transaction.begin();
 
-        //== 트랜잭션 시작 ==//
-        transaction.begin();
+            //== 데이터 10만회 삽입 ==//
+            System.out.println("=== INSERT START ===");
+            for (int i = 0; i < 5000; i++) {
+                Member member = new Member();
+                member.setName("yunbok");
+                member.setId(id++);
+                entityManager.persist(member);
+            }
 
-        //== 데이터 10만회 삽입 ==//
-        Long id = 1L;
-        System.out.println("=== INSERT START ===");
-        for(int i=0; i<100000; i++) {
-            Member member = new Member();
-            member.setName("yunbok");
-            member.setId(id++);
-            entityManager.persist(member);
+            System.out.println("=== INSERT END ===");
+
+            //== 트랜잭션 종료 ==//
+            System.out.println("=== COMMIT ===");
+            transaction.commit();
+
+            //== 측정 종료 ==//
+            System.out.println("소요 시간 : " + (System.currentTimeMillis() - startTime) / 1000.0 + " milli seconds");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        } finally {
+            entityManager.close();
+            entityManagerFactory.close();
         }
-        System.out.println("=== INSERT END ===");
-
-        //== 트랜잭션 종료 ==//
-        System.out.println("=== COMMIT ===");
-        transaction.commit();
-
-        //== 측정 종료 ==//
-        System.out.println("소요 시간 : " + (System.currentTimeMillis() - startTime)/1000.0 + " milli seconds");
-
-        entityManager.close();
-        entityManagerFactory.close();
     }
     /**
      * 동일성 보장
@@ -195,7 +234,7 @@ public class JpaMain {
 
         try {
             Member member = new Member();
-            member.setId(1L);
+            member.setId(192L);
             member.setName("hello");
             entityManager.persist(member);
 
