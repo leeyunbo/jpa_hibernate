@@ -4,6 +4,7 @@ import javax.persistence.*;
 import java.sql.BatchUpdateException;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.List;
 
 public class JpaMain {
     // 5 : 22.389
@@ -14,8 +15,62 @@ public class JpaMain {
 
     public static void main(String[] args) {
         JpaMain jpaMain = new JpaMain();
-        jpaMain.saveMember();
-        jpaMain.batch(1L);
+        jpaMain.nPlusOneProblem2();
+    }
+
+    void nPlusOneProblem2() {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+
+        try {
+            transaction.begin();
+
+            List<IdentityMemberDetail> memberDetailList = entityManager.createQuery(
+                    "select m From IdentityMemberDetail m"
+            ).getResultList();
+
+            for(IdentityMemberDetail identityMemberDetail : memberDetailList) {
+                System.out.println(identityMemberDetail.getDetail());
+            }
+
+            transaction.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            entityManager.close();
+            entityManagerFactory.close();
+        }
+    }
+
+    void nPlusOneProblem() {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+
+        try {
+            //== 트랜잭션 시작 ==//
+            transaction.begin();
+
+            System.out.println("=====Member Insert=====");
+            IdentityMember member = new IdentityMember();
+            member.setName("yunbok");
+            entityManager.persist(member);
+            System.out.println("=====Member End=====");
+
+            for (int i = 1; i < 3; i++) {
+                IdentityMemberDetail memberDetail = new IdentityMemberDetail();
+                memberDetail.setMemberPk(member.getId());
+                memberDetail.setDetail("detail" + i);
+
+                member.getMemberDetailList().add(memberDetail);
+            }
+
+            transaction.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            entityManager.close();
+            entityManagerFactory.close();
+        }
     }
 
     void jpql() {

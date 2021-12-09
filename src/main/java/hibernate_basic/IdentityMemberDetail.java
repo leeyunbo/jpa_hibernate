@@ -3,14 +3,13 @@ package hibernate_basic;
 import javax.persistence.*;
 
 @Entity
-@Table(name= "member_detail")
-public class MemberDetail {
+@Table(name= "identity_member_detail")
+public class IdentityMemberDetail {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    private long memberPk;
 
     private String detail;
 
@@ -22,12 +21,12 @@ public class MemberDetail {
         this.id = id;
     }
 
-    public Member getMember() {
-        return member;
+    public long getMemberPk() {
+        return memberPk;
     }
 
-    public void setMember(Member member) {
-        this.member = member;
+    public void setMemberPk(long memberPk) {
+        this.memberPk = memberPk;
     }
 
     public String getDetail() {
